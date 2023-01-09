@@ -1,0 +1,57 @@
+#!/usr/bin/expect
+
+set host [ lindex $argv 0 ]
+set username [ lindex $argv 1 ]
+set passwd [ lindex $argv 2 ]
+set count [ lindex $argv 3 ]
+set procname [ lindex $argv 4 ]
+
+spawn ssh $username@$host
+expect {
+    "(yes/no)?" {
+        send "yes\n"
+        exp_continue
+    }
+
+    "(y/n)?" {
+        send "y\n"
+        exp_continue
+    }
+    
+    "password:" {
+        send "$passwd\n"
+    }
+}
+
+expect {
+    "\$ " { send "chmod a+x $procname\n" }
+    "\# " { send "chmod a+x $procname\n" }
+}
+
+for { set i 0 } { $i < $count } { incr i } {
+    expect {
+        "\$ " {
+             send_user "count $i\n"
+             send "./$procname\n"
+         }
+
+        "\# " {
+             send_user "count $i\n"
+             send "./$procname\n"
+         }
+    }
+
+}
+
+expect {
+        "\$ " { send "rm -f $procname\n"  }
+        "\# " { send "rm -f $procname\n"  }
+}
+
+expect {
+        "\$ " { send "exit\n"  }
+        "\# " { send "exit\n"  }
+}
+
+expect eof
+

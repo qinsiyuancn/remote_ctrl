@@ -1,0 +1,52 @@
+#!/usr/bin/expect
+
+set host [ lindex $argv 0 ]
+set username [ lindex $argv 1 ]
+set passwd [ lindex $argv 2 ]
+set count [ lindex $argv 3 ]
+
+puts "process access $host $count times"
+spawn ssh $username@$host
+expect {
+    "(yes/no)?" {
+        send "yes\n"
+        exp_continue
+    }
+
+    "(y/n)?" {
+        send "y\n"
+        exp_continue
+    }
+    
+    "password:" {
+        send "$passwd\n"
+    }
+}
+
+
+expect {
+        "\$ " { send "rm -f filetest.txt testfile.txt\n"  }
+        "\# " { send "rm -f filetest.txt testfile.txt\n"  }
+}
+
+for { set i 0 } { $i < $count } { incr i } {
+    expect {
+        "\$ " {
+             send_user "count $i\n"
+             send "touch filetest.txt && (date > filetest.txt) && cat filetest.txt && mv filetest.txt testfile.txt && chmod 777 testfile.txt && chown test testfile.txt && sleep 0.2 && rm -rf testfile.txt\n"
+         }
+
+        "\# " {
+             send_user "count $i\n"
+             send "touch filetest.txt && (date > filetest.txt) && cat filetest.txt && mv filetest.txt testfile.txt && chmod 777 testfile.txt && chown test testfile.txt && sleep 0.2 && rm -rf testfile.txt\n"
+         }
+    }
+}
+
+expect {
+        "\$ " { send "exit\n"  }
+        "\# " { send "exit\n"  }
+}
+
+expect eof
+

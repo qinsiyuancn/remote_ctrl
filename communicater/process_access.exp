@@ -1,0 +1,73 @@
+#!/usr/bin/expect
+
+set host [ lindex $argv 0 ]
+set username [ lindex $argv 1 ]
+set passwd [ lindex $argv 2 ]
+set count [ lindex $argv 3 ]
+set procname [ lindex $argv 4 ]
+
+puts "process access $host $count times"
+spawn ssh $username@$host
+expect {
+    "(yes/no)?" {
+        send "yes\n"
+        exp_continue
+    }
+
+    "(y/n)?" {
+        send "y\n"
+        exp_continue
+    }
+    
+    "password:" {
+        send "$passwd\n"
+    }
+}
+
+expect {
+     "\$ " { send "chmod a+x $procname && ./$procname &\n" }
+     "\# " { send "chmod a+x $procname && ./$procname &\n" }
+}
+
+for { set i 0 } { $i < $count } { incr i } {
+    expect {
+        "\$ " {
+             send_user "count $i\n"
+             send "gdb attach \$(pidof $procname)\n"
+         }
+
+        "\# " {
+             send_user "count $i\n"
+             send "gdb attach \$(pidof $procname)\n"
+         }
+    }
+
+     expect {
+        "\(gdb\) " {
+             send "q\n"
+             exp_continue
+         }
+
+        "Quit anyway? (y or n)" {
+            send "y\n"
+            exp_continue
+        }
+        
+        "\$ " { send "\n"  }
+        "\# " { send "\n"  }
+    }
+}
+
+expect {
+     "\$ " { send "kill -9 \$(pidof $procname) && rm -f $procname\n" }
+     "\# " { send "kill -9 \$(pidof $procname) && rm -f $procname\n" }
+}
+
+expect {
+
+        "\$ " { send "exit\n"  }
+        "\# " { send "exit\n"  }
+}
+
+expect eof
+
