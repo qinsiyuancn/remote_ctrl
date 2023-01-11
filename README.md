@@ -10,8 +10,8 @@
 
 # 使用方法
 
-```
-mermaidgraph
+```mermaid
+graph TD
 start(开始)-->fixconf[修改event.conf内容]
 fixconf-->exec[执行./start.sh]
 exec-->endgraph(结束)
@@ -19,8 +19,8 @@ exec-->endgraph(结束)
 
 # 原理
 
-```
-mermaidgraph
+```mermaid
+graph TD
 start(开始)-->readline{行读event.conf}
 readline-->|不是文件结尾|equal{含有等号=}
 equal-->|是|setenv[设置环境变量]
