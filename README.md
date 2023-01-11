@@ -11,7 +11,7 @@
 # 使用方法
 
 ```
-graph TD
+mermaidgraph
 start(开始)-->fixconf[修改event.conf内容]
 fixconf-->exec[执行./start.sh]
 exec-->endgraph(结束)
@@ -20,14 +20,14 @@ exec-->endgraph(结束)
 # 原理
 
 ```
-graph TD
+mermaidgraph
 start(开始)-->readline{行读event.conf}
-readline--不是文件结尾-->equal{含有等号=}
-equal--是-->setenv[设置环境变量]
+readline-->|不是文件结尾|equal{含有等号=}
+equal-->|是|setenv[设置环境变量]
 setenv-->readline
-equal--否-->exec[执行相应命令]
+equal-->|否|exec[执行相应命令]
 exec-->readline
-readline--文件结尾-->endgraph(结束)
+readline-->|文件结尾|endgraph(结束)
 ```
 # 常见环境变量
 
