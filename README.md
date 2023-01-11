@@ -4,6 +4,10 @@
 
 可用于同时控制多台机器产生事件
 
+# 环境
+
+需要安装expect
+
 # 使用方法
 
 1. 修改event.conf
@@ -28,3 +32,8 @@ count | 事件产生次数
 
 # 集成
 
+将脚本放入cases路径即可
+
+对于需要和远程机器交互的脚本，可以将交互的脚本放入communicater, cases脚本调用communicater交互脚本
+
+其他程序可放入tool
